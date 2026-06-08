@@ -1,0 +1,18 @@
+{
+  "openai": {
+    "description": "OpenAI 공식 API",
+    "default_model": "gpt-3.5-turbo",
+    "requires_base_url": false
+  },
+  "blackbox": {
+    "description": "Blackbox AI (OpenAI 호환 API)",
+    "default_model": "blackboxai/minimax/minimax-free",
+    "requires_base_url": true,
+    "base_url": "https://api.blackbox.ai/v1"
+  },
+  "gemini": {
+    "description": "Google Gemini API",
+    "default_model": "gemini-1.5-flash",
+    "requires_base_url": false
+  }
+}
