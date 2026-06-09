@@ -1,33 +1,38 @@
 import streamlit as st
 import os, json
-from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
 
-# 수엉 
-from langchain_openai import OpenAI
-from langchain_openai import ChatOpenAI
+# st.secrets 우선, 없으면 .env 폴백 (로컬 개발용)
+def _get_secret(key):
+    try:
+        return st.secrets[key]
+    except (KeyError, FileNotFoundError):
+        from dotenv import load_dotenv
+        load_dotenv(override=True)
+        return os.environ.get(key)
 
+API_PROVIDER = _get_secret("API_PROVIDER") or "openai"
+MODEL_NAME   = _get_secret("MODEL_NAME")   or "gpt-4o-mini"
 
-load_dotenv(override=True)
+for env_key, env_val in [
+    ("OPENAI_API_KEY",  _get_secret("OPENAI_API_KEY")),
+    ("GOOGLE_API_KEY",  _get_secret("GOOGLE_API_KEY")),
+]:
+    if env_val:
+        os.environ[env_key] = env_val
 
 with open("providers.json", "r", encoding="utf-8") as f:
-    config = json.load(f)[os.environ["API_PROVIDER"]]
-
-print(f"[*] {config['description']} 모드로 실행합니다. (모델: {os.environ['MODEL_NAME']})")
+    config = json.load(f)[API_PROVIDER]
 
 # 추가 옵션 세팅 (base_url 등)
 kwargs = {"temperature": 0}
 if config.get("base_url"):
     kwargs["base_url"] = config["base_url"]
 
-# LangChain의 내장 팩토리 함수(init_chat_model) 사용!
-# gemini는 google_genai로, 나머지는 openai 규격으로 통일
-real_provider = "google_genai" if os.environ["API_PROVIDER"] == "gemini" else "openai"
+real_provider = "google_genai" if API_PROVIDER == "gemini" else "openai"
 
 llm = init_chat_model(
-    model=os.environ["MODEL_NAME"],
+    model=MODEL_NAME,
     model_provider=real_provider,
     **kwargs
 )

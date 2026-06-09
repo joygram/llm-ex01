@@ -1,1 +1,7 @@
 streamlit
+python-dotenv
+langchain
+langchain-core
+langchain-openai
+langchain-google-genai
+streamlit-ace
