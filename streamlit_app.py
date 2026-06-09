@@ -21,7 +21,13 @@ for env_key, env_val in [
         os.environ[env_key] = env_val
 
 with open("providers.json", "r", encoding="utf-8") as f:
-    config = json.load(f)[API_PROVIDER]
+    providers = json.load(f)
+
+if API_PROVIDER not in providers:
+    st.error(f"❌ API_PROVIDER 값 '{API_PROVIDER}' 이 잘못되었습니다. 사용 가능한 값: {list(providers.keys())}")
+    st.stop()
+
+config = providers[API_PROVIDER]
 
 MODEL_NAME = _get_secret("MODEL_NAME") or config["default_model"]
 
