@@ -2,14 +2,9 @@ import streamlit as st
 import os, json
 from langchain.chat_models import init_chat_model
 
-# st.secrets 우선, 없으면 .env 폴백 (로컬 개발용)
+# 로컬: .streamlit/secrets.toml / 클라우드: 대시보드 Secrets
 def _get_secret(key):
-    try:
-        return st.secrets[key]
-    except (KeyError, FileNotFoundError):
-        from dotenv import load_dotenv
-        load_dotenv(override=True)
-        return os.environ.get(key)
+    return st.secrets.get(key)
 
 API_PROVIDER = _get_secret("API_PROVIDER") or "openai"
 
