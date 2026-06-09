@@ -12,7 +12,6 @@ def _get_secret(key):
         return os.environ.get(key)
 
 API_PROVIDER = _get_secret("API_PROVIDER") or "openai"
-MODEL_NAME   = _get_secret("MODEL_NAME")   or "gpt-4o-mini"
 
 for env_key, env_val in [
     ("OPENAI_API_KEY",  _get_secret("OPENAI_API_KEY")),
@@ -23,6 +22,8 @@ for env_key, env_val in [
 
 with open("providers.json", "r", encoding="utf-8") as f:
     config = json.load(f)[API_PROVIDER]
+
+MODEL_NAME = _get_secret("MODEL_NAME") or config["default_model"]
 
 # 추가 옵션 세팅 (base_url 등)
 kwargs = {"temperature": 0}
