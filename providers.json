@@ -1,18 +1,26 @@
 {
   "openai": {
     "description": "OpenAI 공식 API",
-    "default_model": "gpt-3.5-turbo",
-    "requires_base_url": false
+    "default_model": "gpt-3.5-turbo"
   },
   "blackbox": {
     "description": "Blackbox AI (OpenAI 호환 API)",
     "default_model": "blackboxai/minimax/minimax-free",
-    "requires_base_url": true,
     "base_url": "https://api.blackbox.ai/v1"
   },
   "gemini": {
     "description": "Google Gemini API",
-    "default_model": "gemini-1.5-flash",
-    "requires_base_url": false
+    "default_model": "gemini-1.5-flash"
+  },
+  "llama-cpp": {
+    "description": "llama-cpp-python (로컬 GGUF 모델)",
+    "default_model": "/path/to/model.gguf",
+    "_popular_models": {
+      "llama3":   "bartowski/Meta-Llama-3-8B-Instruct-GGUF",
+      "mistral":  "TheBloke/Mistral-7B-Instruct-v0.2-GGUF",
+      "phi3":     "microsoft/Phi-3-mini-4k-instruct-gguf",
+      "gemma2":   "bartowski/gemma-2-9b-it-GGUF",
+      "qwen2":    "Qwen/Qwen2-7B-Instruct-GGUF"
+    }
   }
 }
