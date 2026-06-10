@@ -18,4 +18,6 @@ dependencies = [
     "protobuf<4",
     "langchain-community>=0.4.2",
     "langchain-classic>=1.0.7",
+    "duckduckgo-search>=8.1.1",
+    "ddgs>=9.14.4",
 ]

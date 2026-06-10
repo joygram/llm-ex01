@@ -59,10 +59,12 @@ question_answer_chain = create_stuff_documents_chain(llm, prompt)
 rag_chain = create_retrieval_chain(retriever_from_llm, question_answer_chain)
 
 
-question = "아내가 먹고 싶어하는 음식은 무엇이야?"
+print("PDF 로딩 완료. 질문을 입력하세요. (종료: q 또는 빈 줄)")
 
-response = rag_chain.invoke({"input": question})
+while True:
+    question = input("\n질문> ").strip()
+    if not question or question.lower() == "q":
+        break
 
-# 결과 출력
-print(f"검색된 참조 문서 개수: {len(response.get('context', []))}")
-print(f"답변: {response['answer']}")
+    response = rag_chain.invoke({"input": question})
+    print(f"답변: {response['answer']}")
