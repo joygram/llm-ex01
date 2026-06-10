@@ -15,8 +15,7 @@ from langchain_classic.chains import create_retrieval_chain
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 
-pdf_path = input("PDF 파일 경로를 입력하세요: ").strip() or "unsu.pdf"
-reader = PdfReader(pdf_path)
+reader = PdfReader("unsu.pdf")
 pages = [
     Document(page_content=page.extract_text() or "", metadata={"page": i})
     for i, page in enumerate(reader.pages)
