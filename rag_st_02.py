@@ -1,0 +1,71 @@
+import os
+import tempfile
+import streamlit as st
+
+OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY")
+
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_chroma import Chroma
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_classic.chains import create_retrieval_chain
+from langchain_classic.chains.combine_documents import create_stuff_documents_chain
+from langchain_core.prompts import ChatPromptTemplate
+
+st.title("PDF RAGGER")
+st.write("----------------")
+
+uploaded_file = st.file_uploader("PDF 파일을 선택하세요", type=["pdf"])
+st.write("----------------")
+
+
+def pdf_to_document(uploaded_file):
+    temp_dir = tempfile.TemporaryDirectory()
+    temp_filepath = os.path.join(temp_dir.name, uploaded_file.name)
+    with open(temp_filepath, "wb") as f:
+        f.write(uploaded_file.getvalue())
+    loader = PyPDFLoader(temp_filepath)
+    return loader.load()
+
+
+if uploaded_file is not None:
+    pages = pdf_to_document(uploaded_file)
+    st.success(f"- PDF 로딩 완료 : {len(pages)} 페이지")
+
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    texts = text_splitter.split_documents(pages)
+    st.info(f"-- 분할된 문서 개수 : {len(texts)}")
+
+    db = Chroma.from_documents(documents=texts, embedding=OpenAIEmbeddings())
+    retriever = db.as_retriever(search_kwargs={"k": 3})
+
+    st.header("PDF에게 질문하세요")
+    question = st.text_input("질문 입력")
+
+    if st.button("질문하기"):
+        if question:
+            with st.spinner("답변 생성 중..."):
+                llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0)
+
+                prompt = ChatPromptTemplate.from_template(
+                    """
+                    당신은 PDF 분석 전문가입니다.
+
+                    아래 Context만 이용해서 질문에 답하세요.
+
+                    Context:
+                    {context}
+
+                    질문:
+                    {input}
+
+                    답변:
+                    """
+                )
+
+                document_chain = create_stuff_documents_chain(llm, prompt)
+                qa_chain = create_retrieval_chain(retriever, document_chain)
+                response = qa_chain.invoke({"input": question})
+                st.write(response["answer"])
+        else:
+            st.warning("질문을 입력하세요.")
