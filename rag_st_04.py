@@ -10,6 +10,7 @@ from langchain_classic.chains import create_retrieval_chain
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.callbacks import BaseCallbackHandler
+from streamlit.runtime.scriptrunner import add_script_run_ctx, get_script_run_ctx
 
 st.title("📄 PDF File Reader 04")
 st.write("----------------")
@@ -50,8 +51,10 @@ class StreamHandler(BaseCallbackHandler):
     def __init__(self, container):
         self.container = container
         self.text = ""
+        self.ctx = get_script_run_ctx()
 
     def on_llm_new_token(self, token, **kwargs):
+        add_script_run_ctx(ctx=self.ctx)
         self.text += token
         self.container.markdown(self.text)
 
